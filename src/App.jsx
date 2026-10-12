@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 import './App.css';
 
@@ -9,16 +9,58 @@ function App() {
     const [tasks, setTasks] = useState([]);
     const [inputValue, setInputValue] = useState('');
 
-    const handleAddTask = () => {
-        if (inputValue.trim() !== '') {
-            setTasks([...tasks, {id: Date.now(), text: inputValue}]);
+    const API_URL = 'https://localhost:4000/api/tasks',
+          API_KEY = 'my-secret-key';
+
+    useEffect(() => {
+        fetch(API_URL, { headers: { 'x-api-key': API_KEY } })
+            .then(res => res.json())
+            .then(setTasks)
+            .catch(err => console.error('Ошибка: ', err));
+    }, []);
+
+    const handleAddTask = async () => {
+        if (!inputValue.trim()) {
+            return;
         }
 
-        setInputValue('');
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY },
+                body: JSON.stringify({ text: inputValue })
+            });
+
+            const newTask = await res.json();
+            setTasks([...tasks, newTask]);
+            setInputValue('');
+        } catch (err) {
+            console.error('Ошибка при добавлении: ', err);
+        }
     }
 
-    const handleDeleteTask = (id) => {
-        setTasks(tasks.filter((task) => task.id !== id));
+    const handleDeleteTask = async (id) => {
+        try {
+            const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE', 'x-api-key': API_KEY });
+            setTasks(tasks.filter((task) => task.id !== id));
+        } catch (err) {
+            console.error('Ошибка при удалении: ', err);
+        }
+    }
+
+    const handleUpdateTask = async (id, newText) => {
+        try {
+            const response = await fetch(`${API_URL}/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY },
+                body: JSON.stringify({ text: newText })
+            });
+            const updated = await response.json();
+
+            setTasks(tasks.map((task) => task.id === id ? { ...task, text: updated.text } : task));
+        } catch (err) {
+            console.error('Ошибка при обновлении: ', err);
+        }
     }
 
     return (
@@ -29,6 +71,7 @@ function App() {
                        onAddTask={handleAddTask} />
             <TaskList tasks={tasks}
                       onDeleteTask={handleDeleteTask}
+                      onUpdateTask={handleUpdateTask}
             />
             <p>Задач: {tasks.length}</p>
         </div>
