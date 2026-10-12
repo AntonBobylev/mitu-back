@@ -36,7 +36,7 @@ export default function TaskItem({ task, onDelete, onUpdate }) {
     return (
         <li className='task-item'>
             { isEditing ? (
-                <div className='edit-mode'>
+                <div className='wrapper'>
                     <input
                         type='text'
                         value={editText}
@@ -46,18 +46,16 @@ export default function TaskItem({ task, onDelete, onUpdate }) {
                         autoFocus
                     />
 
-                    <div className='edit-buttons'>
+                    <div className='task-actions'>
                         <button className='save-btn' onClick={handleSave}>💾</button>
                         <button className='cancel-btn' onClick={handleCancel}>❌</button>
                     </div>
                 </div>
             ) : (
-                <div className='view-mode'>
-                    <span className='task-text'>{task.text}</span>
+                <div className='wrapper'>
+                    <div className='task-text'>{task.text}</div>
                     <div className='task-actions'>
                         <button className='edit-btn' onClick={() => handleEdit()}>✏️</button>
-                    </div>
-                    <div className='delete-btn'>
                         <button className='delete-btn' onClick={() => onDelete(task.id)}>🗑️</button>
                     </div>
                 </div>
