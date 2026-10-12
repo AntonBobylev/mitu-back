@@ -41,8 +41,14 @@ function App() {
 
     const handleDeleteTask = async (id) => {
         try {
-            const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE', 'x-api-key': API_KEY });
-            setTasks(tasks.filter((task) => task.id !== id));
+            const res = await fetch(`${API_URL}/${id}`, {
+                method: 'DELETE',
+                headers: { 'x-api-key': API_KEY }
+            });
+
+            if (res.ok) {
+                setTasks(tasks.filter((task) => task.id !== id));
+            }
         } catch (err) {
             console.error('Ошибка при удалении: ', err);
         }
