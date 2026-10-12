@@ -9,7 +9,7 @@ function App() {
     const [tasks, setTasks] = useState([]);
     const [inputValue, setInputValue] = useState('');
 
-    const API_URL = 'https://localhost:4000/api/tasks',
+    const API_URL = 'http://localhost:4000/api/tasks',
           API_KEY = 'my-secret-key';
 
     useEffect(() => {
